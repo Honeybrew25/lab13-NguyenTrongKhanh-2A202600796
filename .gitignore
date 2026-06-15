@@ -1,5 +1,7 @@
 # binaries are distributed separately per phase (NOT in the public repo)
 bin/
+# vendored runtime libs for the patched binary (large; recreate via SETUP_FIX.md)
+_libs/
 # python / runtime
 __pycache__/
 *.pyc

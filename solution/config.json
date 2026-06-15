@@ -11,8 +11,14 @@
   "verbose_system": false,
   "timeout_ms": 20000,
   "max_completion_tokens": 512,
-  "retry": {"enabled": true, "max_attempts": 3, "backoff_ms": 250},
-  "cache": {"enabled": true},
+  "retry": {
+    "enabled": true,
+    "max_attempts": 3,
+    "backoff_ms": 250
+  },
+  "cache": {
+    "enabled": true
+  },
   "normalize_unicode": true,
   "redact_pii": true,
   "session_drift_rate": 0.0,
