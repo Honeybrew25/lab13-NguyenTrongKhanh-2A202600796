@@ -1,0 +1,21 @@
+{
+  "team": "NguyenTrongKhanh-2A202600796",
+  "phase": "public",
+  "headline": 62.05,
+  "sub": {
+    "correct": 0.5417,
+    "quality": 0.7198,
+    "error": 1.0,
+    "latency": 0.5706,
+    "cost": 0.0,
+    "drift": 0.9709,
+    "prompt": 0.5889
+  },
+  "diag_f1": 0.0,
+  "n": 120,
+  "n_correct": 65,
+  "judge_mode": "offline",
+  "weights_hash": "d3cb6739773a",
+  "key_hash": "9a800fa6968d",
+  "sig": "5a8988ae445793fd75d432048fb12f5f8f14021543aeee254fd9e9489ed7ff4a"
+}

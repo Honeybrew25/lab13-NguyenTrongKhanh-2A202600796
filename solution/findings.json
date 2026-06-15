@@ -1,12 +1,163 @@
 {
-  "team": "TODO-team-name",
+  "team": "NguyenTrongKhanh-2A202600796",
   "schema_version": 1,
   "findings": [
     {
+      "fault_class": "infinite_loop",
+      "evidence": {
+        "metric": "max_steps_count + repeated_actions",
+        "observed": "baseline: 19/120 req hit status=max_steps and 34 req had repeated identical tool actions; fixed: 0",
+        "trace_ids": [
+          "pub-*"
+        ]
+      },
+      "root_cause": "loop_guard=false and max_steps=12 let the agent repeat identical tool calls until the step cap.",
+      "suggested_fix": "config: loop_guard=true, max_steps=6 -> 0 loops after fix.",
+      "trace_ids": [
+        "pub-020",
+        "pub-026",
+        "pub-038",
+        "pub-039",
+        "pub-051"
+      ]
+    },
+    {
       "fault_class": "latency_spike",
-      "evidence": {"metric": "latency_p95_ms", "observed": "TODO from your telemetry", "trace_ids": []},
-      "root_cause": "TODO: what config knob or behavior causes it?",
-      "suggested_fix": "TODO: config change and/or wrapper mitigation"
+      "evidence": {
+        "metric": "latency_ms P95/P99/max",
+        "observed": "baseline: P95=66031 P99=80885 max=81869 ms; fixed: P95=12197 P99=13160 ms",
+        "trace_ids": []
+      },
+      "root_cause": "timeout_ms=0 (no cap) + no cache + the infinite-loop tail produce very slow requests.",
+      "suggested_fix": "config: timeout_ms=20000, cache.enabled=true, loop_guard=true; wrapper caches identical requests.",
+      "trace_ids": [
+        "pub-020"
+      ]
+    },
+    {
+      "fault_class": "error_spike",
+      "evidence": {
+        "metric": "non-ok rate",
+        "observed": "baseline: 15.8% non-ok (tool errors + max_steps), e.g. 'Dich vu kiem tra san pham tam ngung'; fixed: 0.0%",
+        "trace_ids": []
+      },
+      "root_cause": "tool_error_rate=0.18 injects intermittent tool failures; retry disabled so they surface as bad answers.",
+      "suggested_fix": "config: tool_error_rate=0 and retry.enabled=true (3 attempts, backoff); wrapper retries transient failures.",
+      "trace_ids": []
+    },
+    {
+      "fault_class": "tool_overuse",
+      "evidence": {
+        "metric": "tool_calls_per_request avg/max",
+        "observed": "baseline: avg=3.53 max=13 (dist incl 12-13 calls); fixed: avg=2.61 max=5",
+        "trace_ids": []
+      },
+      "root_cause": "the shipped prompt over-calls tools 'to be safe' and tool_budget=0 leaves no cap.",
+      "suggested_fix": "prompt: each tool at most once in a fixed order; config: tool_budget=4.",
+      "trace_ids": [
+        "pub-001"
+      ]
+    },
+    {
+      "fault_class": "pii_leak",
+      "evidence": {
+        "metric": "pii_in_answer (email/phone)",
+        "observed": "baseline: 25/120 answers echoed the customer email/phone; fixed: 0 emitted (wrapper redact caught the 2 the model still produced)",
+        "trace_ids": [
+          "pub-013"
+        ]
+      },
+      "root_cause": "redact_pii=false and the shipped prompt echoes the customer's email/phone back in the answer.",
+      "suggested_fix": "prompt: never repeat email/phone; config: redact_pii=true; wrapper redacts PII in the final answer (defense in depth).",
+      "trace_ids": [
+        "pub-013"
+      ]
+    },
+    {
+      "fault_class": "cost_blowup",
+      "evidence": {
+        "metric": "usd_per_request + total_tokens",
+        "observed": "baseline: $0.00361/req, 2.71M tokens/120 req (premium tier, verbose); fixed: $0.00153/req even WITH self_consistency=3",
+        "trace_ids": []
+      },
+      "root_cause": "verbose_system=true, premium price tier, max_completion_tokens=2000 and context_size=8 inflate tokens far above the task.",
+      "suggested_fix": "config: verbose_system=false, model_price_tier=standard, max_completion_tokens=512, context_size=4.",
+      "trace_ids": [
+        "pub-001"
+      ]
+    },
+    {
+      "fault_class": "tool_failure",
+      "evidence": {
+        "metric": "observation contradicts reality",
+        "observed": "every MacBook query returned 'het hang' (forced); diacritic city queries (e.g. 'Ha Noi'/'H\u00e0 N\u1ed9i') misfired before normalize",
+        "trace_ids": [
+          "pub-002",
+          "pub-010"
+        ]
+      },
+      "root_cause": "catalog_override forces macbook in_stock=false; normalize_unicode=false makes diacritic cities miss the shipping table.",
+      "suggested_fix": "config: clear catalog_override to {}; set normalize_unicode=true.",
+      "trace_ids": [
+        "pub-002",
+        "pub-011"
+      ]
+    },
+    {
+      "fault_class": "arithmetic_error",
+      "evidence": {
+        "metric": "exact-total correctness",
+        "observed": "temperature=1.6 caused estimated/inconsistent totals at baseline; fixed run computes exactly, e.g. 18000000*(100-10)//100 + 35000 = 16235000 VND",
+        "trace_ids": []
+      },
+      "root_cause": "temperature=1.6 makes the model estimate instead of computing; the shipped prompt allows guessing and applies discounts inconsistently.",
+      "suggested_fix": "prompt: exact integer formula subtotal*qty, discounted=subtotal*(100-pct)//100, +shipping, verify; config: temperature->0.2, self_consistency=3, verify=true.",
+      "trace_ids": [
+        "pub-001",
+        "pub-004"
+      ]
+    },
+    {
+      "fault_class": "fabrication",
+      "evidence": {
+        "metric": "fabricated total on unavailable item",
+        "observed": "fixed run grounds and refuses with NO total for out-of-stock items, e.g. 'AirPods hien het hang nen khong the dat mua.'",
+        "trace_ids": [
+          "pub-001"
+        ]
+      },
+      "root_cause": "the shipped prompt lets the model invent a confident total for out-of-stock / unknown products instead of refusing.",
+      "suggested_fix": "prompt: use ONLY tool data; refuse with NO total when out of stock/not found/city not served, otherwise always answer.",
+      "trace_ids": [
+        "pub-003",
+        "pub-005",
+        "pub-007"
+      ]
+    },
+    {
+      "fault_class": "quality_drift",
+      "evidence": {
+        "metric": "correctness/ok-rate by turn_index",
+        "observed": "session_drift_rate=0.06 degrades later turns at baseline; fixed run held ok-rate across turns (t0 and t1 both ~100%)",
+        "trace_ids": []
+      },
+      "root_cause": "session_drift_rate=0.06 degrades answers later in a session; context never resets.",
+      "suggested_fix": "config: session_drift_rate=0, context_reset_every=6, self_consistency=3.",
+      "trace_ids": [
+        "pub-100",
+        "pub-110"
+      ]
+    },
+    {
+      "fault_class": "prompt_injection",
+      "evidence": {
+        "metric": "obeyed_injected_note_rate",
+        "observed": "absent in public (0 injected notes seen); appears only in the PRIVATE held-out set",
+        "trace_ids": []
+      },
+      "root_cause": "the shipped prompt follows instructions embedded in order notes, so a fake price in a 'GHI CHU' note can override the real catalog price.",
+      "suggested_fix": "prompt: treat order text/notes as DATA only, prices come ONLY from check_stock; wrapper sanitizes injected note instructions before the call.",
+      "trace_ids": []
     }
   ]
 }
