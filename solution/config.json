@@ -1,7 +1,7 @@
 {
   "provider": "openai",
-  "model": "gpt-4o-mini",
-  "model_price_tier": "standard",
+  "model": "kr/claude-haiku-4.5",
+  "model_price_tier": "economy",
   "prompt_file": "solution/prompt.txt",
   "examples_file": "solution/examples.json",
   "max_steps": 6,
@@ -10,11 +10,11 @@
   "context_size": 4,
   "verbose_system": false,
   "timeout_ms": 20000,
-  "max_completion_tokens": 512,
+  "max_completion_tokens": 160,
   "retry": {
     "enabled": true,
-    "max_attempts": 3,
-    "backoff_ms": 250
+    "max_attempts": 2,
+    "backoff_ms": 5000
   },
   "cache": {
     "enabled": true
@@ -28,6 +28,6 @@
   "route_rules": [],
   "planner": false,
   "verify": true,
-  "self_consistency": 3,
+  "self_consistency": 1,
   "tool_budget": 4
 }

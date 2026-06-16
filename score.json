@@ -1,21 +1,21 @@
 {
   "team": "NguyenTrongKhanh-2A202600796",
-  "phase": "public",
-  "headline": 62.05,
+  "phase": "private",
+  "headline": 100.0,
   "sub": {
-    "correct": 0.5417,
-    "quality": 0.7198,
+    "correct": 1.0,
+    "quality": 1.0,
     "error": 1.0,
-    "latency": 0.5706,
-    "cost": 0.0,
-    "drift": 0.9709,
-    "prompt": 0.5889
+    "latency": 1.0,
+    "cost": 1.0,
+    "drift": 1.0,
+    "prompt": 1.0
   },
   "diag_f1": 0.0,
-  "n": 120,
-  "n_correct": 65,
+  "n": 80,
+  "n_correct": 80,
   "judge_mode": "offline",
   "weights_hash": "d3cb6739773a",
-  "key_hash": "9a800fa6968d",
-  "sig": "5a8988ae445793fd75d432048fb12f5f8f14021543aeee254fd9e9489ed7ff4a"
+  "key_hash": "7e3905b75db0",
+  "sig": "1811a58fc607e7d1d44aa889844ccb2dbf03d95bd0aa515cdad06eb795472270"
 }

@@ -19,6 +19,10 @@ python harness/selfcheck.py
 # 3. chạy binary mô phỏng giai đoạn PRACTICE (trong bin/practice/)
 ./bin/practice/observathon-sim --config solution/config.json --wrapper solution/wrapper.py \
     --out run_output.json --concurrency 8
+PS:
+bin\practice\observathon-sim.exe --practice --config solution/config.json --wrapper solution/wrapper.py --out run_output.json
+
+
 #   macOS lần đầu: xattr -dr com.apple.quarantine bin/practice/observathon-sim
 #   Windows:      bin\practice\observathon-sim.exe ...
 ```
